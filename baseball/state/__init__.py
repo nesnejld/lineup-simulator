@@ -8,11 +8,14 @@ class SimpleGameState:
         self.runners = [0] * 3
 
     def getCurrentHitter(self):
-        return self.lineup[self.lineupIndex]
+        player =  self.lineup[self.lineupIndex]
+        self.lineupIndex=(self.lineupIndex+1) % len(self.lineup)
+        return player
+    
 
     def updateState(self, event):
         match event:
-            case 1 | 2 | 3  :
+            case 1 | 2 | 3:
                 i = 2
                 while i >= 0:
                     if self.runners[i] == 1:
@@ -26,12 +29,12 @@ class SimpleGameState:
                 self.runners[event - 1] = 1
             case 4:
                 self.score += sum(self.runners) + 1
-                self.runners = [0,0,0]
+                self.runners = [0, 0, 0]
 
             case 5:
                 i = 0
                 # find first empty base
-                while i < 3 and self.runners[i] == 1 :
+                while i < 3 and self.runners[i] == 1:
                     i += 1
                 if i < 3:
                     self.runners[i] = 1
@@ -42,4 +45,11 @@ class SimpleGameState:
                 if self.outs > 2:
                     self.inning += 1
                     self.outs = 0
+                    self.runners = [0]*3
+        return self
 
+    def __str__(self):
+        return f"""out: {self.outs}; inning: {self.inning}; score: {self.score}; runners: {self.runners}"""
+
+    def gameover(self) -> bool:
+        return self.inning > 9
